@@ -8,6 +8,11 @@ INSERT INTO setting( category, name, type, value, description )
 VALUES( "voip", "survey without sip", "boolean", "false",
 "Whether to allow operators to fill out surveys without an active SIP connection." );
 
+-- queue
+INSERT INTO setting( category, name, type, value, description )
+VALUES( "queue", "reverse sort time", "string", "17:00",
+"The time when the weekday calling queue sorting is reversed (from youngest to oldest)." );
+
 -- queue state
 INSERT INTO setting( category, name, type, value, description )
 SELECT "queue state", name, "boolean", "true",
@@ -33,6 +38,11 @@ INSERT INTO setting( category, name, type, value, description )
 VALUES( "appointment", "call post-window", "integer", "15",
 "Number of minutes after an appointment when it is considered assignable, after which it will be
 considered missed." );
+
+-- callback
+INSERT INTO setting( category, name, type, value, description )
+VALUES( "callback", "call pre-window", "integer", "5",
+"Number of minutes before a callback when it is considered assignable." );
 
 -- calling times
 INSERT INTO setting( category, name, type, value, description )
@@ -67,24 +77,15 @@ VALUES( "callback timing", "no answer", "integer", "1440",
 previous call." );
 
 INSERT INTO setting( category, name, type, value, description )
-VALUES( "callback timing", "machine message", "integer", "4320",
-"Number of minutes to wait before calling back a participant where the previous call was an
-answering machine and a message was left." );
-
-INSERT INTO setting( category, name, type, value, description )
-VALUES( "callback timing", "machine no message", "integer", "4320",
-"Number of minutes to wait before calling back a participant where the previous call was an
-answering machine ano no message was left." );
-
-INSERT INTO setting( category, name, type, value, description )
 VALUES( "callback timing", "fax", "integer", "15",
 "Number of minutes to wait before calling back a participant where the previous call was a fax
 machine." );
 
 INSERT INTO setting( category, name, type, value, description )
 VALUES( "callback timing", "not reached", "integer", "4320",
-"Number of minutes to wait before calling back a participant where the previous call reached a
-person other than the participant." );
+"Number of minutes to wait before calling back a participant where the previous call reached
+a person other than the participant, was an answering machine or was a disconnected or wrong
+number."
 
 INSERT INTO setting( category, name, type, value, description )
 VALUES( "callback timing", "hang up", "integer", "2880",

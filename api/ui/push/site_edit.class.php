@@ -3,7 +3,6 @@
  * site_edit.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package sabretooth\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, sabretooth\util;
  * push: site edit
  *
  * Edit a site.
- * @package sabretooth\ui
  */
 class site_edit extends \cenozo\ui\push\site_edit
 {
@@ -30,6 +28,23 @@ class site_edit extends \cenozo\ui\push\site_edit
 
     $this->set_machine_request_enabled( true );
     $this->set_machine_request_url( MASTODON_URL );
+  }
+
+  /**
+   * Sets up the operation with any pre-execution instructions that may be necessary.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access protected
+   */
+  protected function setup()
+  {
+    parent::setup();
+
+    $columns = $this->get_argument( 'columns' );
+
+    // only send a machine request if editing the name or time zone
+    $this->set_machine_request_enabled(
+      array_key_exists( 'name', $columns ) || array_key_exists( 'timezone', $columns ) );
   }
 
   /**

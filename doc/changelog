@@ -1,0 +1,129 @@
+====================================================================================================
+1.1.8
+====================================================================================================
+
+* Scheduled calls
+  - In the participant's details a new "Scheduled Call" list has been added
+  - Added new category to queue similar to appointments
+  - Participants are held in "waiting" queue until scheduled call time arrives at which point they
+    are assigned in priority after appointments
+
+* Cognitive Rescoring
+  - Minor changes due to requirement changes
+
+====================================================================================================
+1.1.7
+====================================================================================================
+
+* Supervisors now have full list/view/add/delete access to operator away times
+  - existing away times user, start and end times can be changed
+  - new away times can be added to users with operator access to the supervisor's site
+  - away times must always have no operator activity between the start/end times
+
+* Adding caching ability to select reports
+  - cached reports are generated overnight to save processing and wait time
+
+* Changing participant status report to have new "Breakdown by" and "Province" options
+  - breakdown includes old "site or province" options and the new "quota" option
+  - breaking down by quota organizes the report into quota categories (gender & age group)
+  - province option restricts to participants who's primary address is in that province
+
+* Queues have been thinned out to improve performance
+  - outside calling time is now higher in the tree
+  - "machine message" and "machine no message" have been combined into the "not reached" queue
+  - "always available" has been merged into the "not available" queue
+  - performance has been internally improved
+
+* Adding email address to participant view
+  - This property is synched with the email address in Mastodon
+
+* Added new appointment report
+  - Report can be ran by supervisors for any one day, shows list of all appointments on that day
+
+====================================================================================================
+1.1.6
+====================================================================================================
+
+* Participant status report restriction by participant synch date
+  - This report now has a start/end date parameters which restricts the list based on when the
+    participant was created in Sabretooth
+
+* Adding quotas (full list/view/add/delete functionality)
+  - Quotas are application linked, so changes made in Sabretooth will be changed in Mastodon as well
+
+* Queue restriction by quota
+  - Quotas include a "disabled" column which, when set to true, removes those participants from the
+    calling queues
+
+* Listen in to phone calls
+  - Supervisors can now listen-in to their operator's live phone calls
+  - The assignment list (as well as the "open assignment list") has a magnifying glass to connect to
+    a call
+  - Viewing an assignment also has a "listen in" button (when the assignment has a call which is
+    active)
+
+* Calendar date persistence
+  - Calendars don't reset to today's date after changing event
+
+* Various bug fixes
+
+====================================================================================================
+1.1.5
+====================================================================================================
+
+* View details added to appointment view
+  - When viewing appointments a new "view details" button has been added which shows the
+    participant's details
+  - The participant's UID has been added to the appointment view
+
+* Mailout report (Val's first contribution to Sabretooth!)
+  - this report allows administrators to prepare mail-merges to mail information and/or proxy
+    packages to participants
+  - report can be broken down by site and source
+
+* Sorting queues by age on weekdays
+  - All queues are now sorted by age (oldest to youngest) on weekdays
+  - A new setting "queue","reverse sort time" defines the time where the sorting is reversed from
+    youngest to oldest
+  - The default is 5pm so that older participants are (preferentially) called during the day and
+    younger participants
+    called in the evenings
+  - The reverse sort time setting is based on the operator's time zone, not the participant's
+
+* Various bug fixes
+
+====================================================================================================
+1.1.4
+====================================================================================================
+
+* Secondary contact script added to system
+  - Operators will now see a "Secondary Contacts" button when they are assigned a participants who
+    has had 10+ failed call attempts
+  - The number of failed call attempts (default 10) is a setting which can be set individually by
+    each site.
+  - Clicking the secondary contact button will provide a list of alternates who can be called using
+    the secondary contact script
+  - Operators MUST still call the participant at least once before ending their assignment, even if
+    they call a secondary
+  - Admins and supervisors will see a secondary button in the participant view page for participants
+    with 10+ failed call attempts
+
+* Opal integration completed
+  - There is now an option to add an "Opal Instance" to Sabretooth
+  - Opal instances gain access to all collected data in the 60-minute interview
+  - Admins do not need to do anything here, I will be managing Opal instances personally
+
+* Availability changed from "only call when" to "prefer calling when"
+  - operators are not restricted to calling participants within available times anymore, instead
+    availability only causes a priority in queues
+  - all availability sub-queues now have the three "ready to call" options:
+    1. call participants who are currently available
+    2. call participants who are always available
+    3. call participants who are not currently available
+
+* Supervisors now see an "open assignment" list in their home screen.
+  - when first logging in at the "home" screen supervisors will see a list of all open assignments
+  - this may be useful to track down operators who may have accidentally forgotten to close
+    assignments
+
+* Various bug fixes

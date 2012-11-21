@@ -3,7 +3,6 @@
  * survey_manager.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package sabretooth\business
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, sabretooth\util;
 
 /**
  * The survey manager is responsible for business-layer survey functionality.
- *
- * @package sabretooth\business
  */
 class survey_manager extends \cenozo\singleton
 {
@@ -55,10 +52,10 @@ class survey_manager extends \cenozo\singleton
       
       return LIMESURVEY_URL.sprintf( '/index.php?sid=%s&lang=%s&token=%s', $sid, $lang, $token );
     }
-    else if( array_key_exists( 'contacting_alternates', $_COOKIE ) )
+    else if( array_key_exists( 'secondary_id', $_COOKIE ) )
     {
       // get the participant being sourced
-      $db_participant = lib::create( 'database\participant', $_COOKIE['contacting_alternates'] );
+      $db_participant = lib::create( 'database\participant', $_COOKIE['secondary_participant_id'] );
       if( is_null( $db_participant ) ) return false;
 
       // determine the current sid and token
@@ -167,8 +164,6 @@ class survey_manager extends \cenozo\singleton
       $tokens_mod->where( 'token', '=', $token );
       $db_tokens = current( $tokens_class_name::select( $tokens_mod ) );
 
-      // by default the interview has NOT been rescored
-      $db_interview->rescored = 'No';
       if( false === $db_tokens )
       { // token not found, create it
         $db_tokens = lib::create( 'database\limesurvey\tokens' );
@@ -180,7 +175,7 @@ class survey_manager extends \cenozo\singleton
       }
       else if( 'N' != $db_tokens->completed )
       { // rescoring is complete
-        $db_interview->rescored = 'Yes';
+        $db_interview->rescored = true;
       }
 
       // save whatever rescoring state we set above
@@ -190,10 +185,10 @@ class survey_manager extends \cenozo\singleton
       $this->current_sid = $sid;
       $this->current_token = $token;
     }
-    else if( array_key_exists( 'contacting_alternates', $_COOKIE ) )
+    else if( array_key_exists( 'secondary_id', $_COOKIE ) )
     {
       // get the participant being sourced
-      $db_participant = lib::create( 'database\participant', $_COOKIE['contacting_alternates'] );
+      $db_participant = lib::create( 'database\participant', $_COOKIE['secondary_participant_id'] );
       if( is_null( $db_participant ) )
       {
         log::warning( 'Tried to determine survey information for an invalid participant.' );
@@ -201,8 +196,8 @@ class survey_manager extends \cenozo\singleton
       }
 
       $setting_manager = lib::create( 'business\setting_manager' );
-      $sid = $setting_manager->get_setting( 'general', 'alternate_script' );
-      $token = $db_participant->uid;
+      $sid = $setting_manager->get_setting( 'general', 'secondary_survey' );
+      $token = $_COOKIE['secondary_id'];
 
       $tokens_class_name::set_sid( $sid );
       $survey_class_name::set_sid( $sid );
@@ -222,7 +217,7 @@ class survey_manager extends \cenozo\singleton
       $db_tokens->update_attributes( $db_participant );
       $db_tokens->save();
 
-      // the alternate survey can be brought back up after it is complete, so always set these
+      // the secondary survey can be brought back up after it is complete, so always set these
       $this->current_sid = $sid;
       $this->current_token = $token;
     }

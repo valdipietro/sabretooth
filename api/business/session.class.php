@@ -3,7 +3,6 @@
  * session.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package sabretooth\business
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, sabretooth\util;
 
 /**
  * Extends Cenozo's session class with custom functionality
- *
- * @package sabretooth\business
  */
 class session extends \cenozo\business\session
 {
@@ -272,9 +269,12 @@ class session extends \cenozo\business\session
       $_SESSION['slot'][$slot]['stack']['widgets'] = array();
     }
 
-    // kill the rescore and alternate cookies in case it exists
+    // kill the rescore and secondary contact cookies in case they exist
     setcookie( 'rescoring_interview', NULL, time() - 3600, COOKIE_PATH );
-    setcookie( 'contacting_alternates', NULL, time() - 3600, COOKIE_PATH );
+    setcookie( 'secondary_id', NULL, time() - 3600, COOKIE_PATH );
+    setcookie( 'secondary_participant_id', NULL, time() - 3600, COOKIE_PATH );
+    setcookie( 'secondary_participant_first_name', NULL, time() - 3600, COOKIE_PATH );
+    setcookie( 'secondary_participant_last_name', NULL, time() - 3600, COOKIE_PATH );
 
     $this->update_slot_cookies();
   }

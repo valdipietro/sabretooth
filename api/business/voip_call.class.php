@@ -3,7 +3,6 @@
  * voip_call.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package sabretooth\business
  * @filesource
  */
 
@@ -14,8 +13,6 @@ require_once SHIFT8_PATH.'/library/Shift8.php';
 
 /**
  * The details of a voip call.
- * 
- * @package sabretooth\business
  */
 class voip_call extends \cenozo\base_object
 {
@@ -129,7 +126,7 @@ class voip_call extends \cenozo\base_object
     if( !$this->manager->originate(
       'Local/playback@default',  // channel
       'default',                 // context
-      'chanspy',                 // extension
+      'playbackspy',             // extension
       1,                         // priority
       false,                     // application
       false,                     // data
@@ -145,15 +142,15 @@ class voip_call extends \cenozo\base_object
     
     if( $bridge )
     {
-      // Sleep for 2 miliseconds to try and fix asterisk bug caused by playing two sounds
+      // Sleep for 5 miliseconds to try and fix asterisk bug caused by playing two sounds
       // in quick succession
-      time_nanosleep( 0, 200000000 );
+      time_nanosleep( 0, 500000000 );
 
       // play sound in bridged channel
       if( !$this->manager->originate(
         'Local/playback@default',  // channel
         'default',                 // context
-        'chanspy',                 // extension
+        'playbackspy',             // extension
         1,                         // priority
         false,                     // application
         false,                     // data

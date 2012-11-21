@@ -56,7 +56,9 @@ CREATE  TABLE IF NOT EXISTS `participant` (
   `status` ENUM('deceased', 'deaf', 'mentally unfit','language barrier','age range','not canadian','federal reserve','armed forces','institutionalized','noncompliant','other') NULL DEFAULT NULL ,
   `language` ENUM('en','fr') NULL DEFAULT NULL ,
   `site_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'If not null then force all calls to this participant to the site.' ,
+  `email` VARCHAR(255) NULL ,
   `prior_contact_date` DATE NULL DEFAULT NULL ,
+  `scheduled_call_datetime` DATETIME NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `dk_active` (`active` ASC) ,
   INDEX `dk_status` (`status` ASC) ,
@@ -812,14 +814,117 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `opal_instance`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `opal_instance` ;
+
+CREATE  TABLE IF NOT EXISTS `opal_instance` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `user_id` INT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_user_id` (`user_id` ASC) ,
+  UNIQUE INDEX `uq_user_id` (`user_id` ASC) ,
+  CONSTRAINT `fk_opal_instance_user_id`
+    FOREIGN KEY (`user_id` )
+    REFERENCES `user` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `quota`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `quota` ;
+
+CREATE  TABLE IF NOT EXISTS `quota` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `region_id` INT UNSIGNED NOT NULL ,
+  `gender` ENUM('male','female') NOT NULL ,
+  `age_group_id` INT UNSIGNED NOT NULL ,
+  `population` INT NOT NULL ,
+  `disabled` TINYINT(1) NOT NULL DEFAULT false ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_region_id` (`region_id` ASC) ,
+  INDEX `fk_age_group_id` (`age_group_id` ASC) ,
+  UNIQUE INDEX `uq_region_id_gender_age_group_id` (`region_id` ASC, `gender` ASC, `age_group_id` ASC) ,
+  CONSTRAINT `fk_quota_region`
+    FOREIGN KEY (`region_id` )
+    REFERENCES `region` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_quota_age_group_id`
+    FOREIGN KEY (`age_group_id` )
+    REFERENCES `age_group` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `site`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `site` ;
+
+CREATE  TABLE IF NOT EXISTS `site` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `name` VARCHAR(45) NOT NULL ,
+  `timezone` ENUM('Canada/Pacific','Canada/Mountain','Canada/Central','Canada/Eastern','Canada/Atlantic','Canada/Newfoundland') NOT NULL ,
+  `voip_host` VARCHAR(45) NULL ,
+  `voip_xor_key` VARCHAR(45) NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `callback`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `callback` ;
+
+CREATE  TABLE IF NOT EXISTS `callback` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `update_timestamp` TIMESTAMP NOT NULL ,
+  `create_timestamp` TIMESTAMP NOT NULL ,
+  `participant_id` INT UNSIGNED NOT NULL ,
+  `phone_id` INT UNSIGNED NULL DEFAULT NULL ,
+  `assignment_id` INT UNSIGNED NULL DEFAULT NULL COMMENT 'This callback\'s assignment.' ,
+  `datetime` DATETIME NOT NULL ,
+  `reached` TINYINT(1) NULL DEFAULT NULL COMMENT 'If the callback was met, whether the participant was reached.' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_participant_id` (`participant_id` ASC) ,
+  INDEX `fk_assignment_id` (`assignment_id` ASC) ,
+  INDEX `dk_reached` (`reached` ASC) ,
+  INDEX `fk_phone_id` (`phone_id` ASC) ,
+  INDEX `dk_datetime` (`datetime` ASC) ,
+  CONSTRAINT `fk_callback_participant_id`
+    FOREIGN KEY (`participant_id` )
+    REFERENCES `participant` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_callback_assignment_id`
+    FOREIGN KEY (`assignment_id` )
+    REFERENCES `assignment` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_callback_phone_id`
+    FOREIGN KEY (`phone_id` )
+    REFERENCES `phone` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Placeholder table for view `participant_first_address`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `participant_first_address` (`participant_id` INT, `address_id` INT);
-
--- -----------------------------------------------------
--- Placeholder table for view `participant_last_assignment`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `participant_last_assignment` (`participant_id` INT, `assignment_id` INT);
 
 -- -----------------------------------------------------
 -- Placeholder table for view `assignment_last_phone_call`
@@ -829,17 +934,12 @@ CREATE TABLE IF NOT EXISTS `assignment_last_phone_call` (`assignment_id` INT, `p
 -- -----------------------------------------------------
 -- Placeholder table for view `participant_last_consent`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `participant_last_consent` (`participant_id` INT, `consent_id` INT);
+CREATE TABLE IF NOT EXISTS `participant_last_consent` (`participant_id` INT, `consent_id` INT, `event` INT);
 
 -- -----------------------------------------------------
 -- Placeholder table for view `participant_primary_address`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `participant_primary_address` (`participant_id` INT, `address_id` INT);
-
--- -----------------------------------------------------
--- Placeholder table for view `participant_last_contacted_phone_call`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `participant_last_contacted_phone_call` (`participant_id` INT, `phone_call_id` INT);
 
 -- -----------------------------------------------------
 -- Placeholder table for view `participant_site`
@@ -855,6 +955,16 @@ CREATE TABLE IF NOT EXISTS `participant_last_written_consent` (`participant_id` 
 -- Placeholder table for view `participant_phone_call_status_count`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `participant_phone_call_status_count` (`participant_id` INT, `status` INT, `total` INT);
+
+-- -----------------------------------------------------
+-- Placeholder table for view `interview_last_assignment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `interview_last_assignment` (`interview_id` INT, `assignment_id` INT);
+
+-- -----------------------------------------------------
+-- Placeholder table for view `participant_last_appointment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `participant_last_appointment` (`participant_id` INT, `appointment_id` INT, `reached` INT);
 
 -- -----------------------------------------------------
 -- View `participant_first_address`
@@ -886,22 +996,6 @@ WHERE t1.rank = (
   GROUP BY t2.participant_id );
 
 -- -----------------------------------------------------
--- View `participant_last_assignment`
--- -----------------------------------------------------
-DROP VIEW IF EXISTS `participant_last_assignment` ;
-DROP TABLE IF EXISTS `participant_last_assignment`;
-CREATE  OR REPLACE VIEW `participant_last_assignment` AS
-SELECT interview_1.participant_id, assignment_1.id as assignment_id
-FROM assignment AS assignment_1, interview AS interview_1
-WHERE interview_1.id = assignment_1.interview_id
-AND assignment_1.start_datetime = (
-  SELECT MAX( assignment_2.start_datetime )
-  FROM assignment AS assignment_2, interview AS interview_2
-  WHERE interview_2.id = assignment_2.interview_id
-  AND interview_1.participant_id = interview_2.participant_id
-  GROUP BY interview_2.participant_id );
-
--- -----------------------------------------------------
 -- View `assignment_last_phone_call`
 -- -----------------------------------------------------
 DROP VIEW IF EXISTS `assignment_last_phone_call` ;
@@ -924,13 +1018,15 @@ AND phone_call_1.start_datetime = (
 DROP VIEW IF EXISTS `participant_last_consent` ;
 DROP TABLE IF EXISTS `participant_last_consent`;
 CREATE  OR REPLACE VIEW `participant_last_consent` AS
-SELECT participant_id, id AS consent_id
-FROM consent AS t1
-WHERE t1.date = (
+SELECT participant.id AS participant_id, t1.id AS consent_id, t1.event AS event
+FROM participant
+LEFT JOIN consent AS t1
+ON participant.id = t1.participant_id
+AND t1.date = (
   SELECT MAX( t2.date )
   FROM consent AS t2
-  WHERE t1.participant_id = t2.participant_id
-  GROUP BY t2.participant_id );
+  WHERE t1.participant_id = t2.participant_id )
+GROUP BY participant.id;
 
 -- -----------------------------------------------------
 -- View `participant_primary_address`
@@ -948,25 +1044,6 @@ WHERE t1.rank = (
   AND region.site_id IS NOT NULL
   AND t1.participant_id = t2.participant_id
   GROUP BY t2.participant_id );
-
--- -----------------------------------------------------
--- View `participant_last_contacted_phone_call`
--- -----------------------------------------------------
-DROP VIEW IF EXISTS `participant_last_contacted_phone_call` ;
-DROP TABLE IF EXISTS `participant_last_contacted_phone_call`;
-CREATE  OR REPLACE VIEW `participant_last_contacted_phone_call` AS
-SELECT interview_1.participant_id, phone_call_1.id as phone_call_id
-FROM phone_call AS phone_call_1, assignment AS assignment_1, interview AS interview_1
-WHERE phone_call_1.assignment_id = assignment_1.id
-AND interview_1.id = assignment_1.interview_id
-AND phone_call_1.start_datetime = (
-  SELECT MAX( phone_call_2.start_datetime )
-  FROM phone_call AS phone_call_2, assignment AS assignment_2, interview AS interview_2
-  WHERE phone_call_2.status = "contact"
-  AND phone_call_2.assignment_id = assignment_2.id
-  AND assignment_2.interview_id = interview_2.id
-  AND interview_1.participant_id = interview_2.participant_id
-  GROUP BY interview_2.participant_id );
 
 -- -----------------------------------------------------
 -- View `participant_site`
@@ -1010,6 +1087,41 @@ JOIN interview ON participant.id = interview.participant_id
 JOIN assignment ON interview.id = assignment.interview_id
 JOIN phone_call ON assignment.id = phone_call.assignment_id
 GROUP BY participant.id, phone_call.status;
+
+-- -----------------------------------------------------
+-- View `interview_last_assignment`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `interview_last_assignment` ;
+DROP TABLE IF EXISTS `interview_last_assignment`;
+CREATE  OR REPLACE VIEW `interview_last_assignment` AS
+SELECT interview_1.id AS interview_id,
+       assignment_1.id AS assignment_id
+FROM assignment assignment_1
+JOIN interview interview_1
+WHERE interview_1.id = assignment_1.interview_id
+AND assignment_1.start_datetime = (
+  SELECT MAX( assignment_2.start_datetime )
+  FROM assignment assignment_2
+  JOIN interview interview_2
+  WHERE interview_2.id = assignment_2.interview_id
+  AND interview_1.id = interview_2.id
+  GROUP BY interview_2.id
+);
+
+-- -----------------------------------------------------
+-- View `participant_last_appointment`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `participant_last_appointment` ;
+DROP TABLE IF EXISTS `participant_last_appointment`;
+CREATE  OR REPLACE VIEW `participant_last_appointment` AS
+SELECT participant.id AS participant_id, t1.id AS appointment_id, t1.reached
+FROM participant
+LEFT JOIN appointment t1
+ON participant.id = t1.participant_id
+AND t1.datetime = (
+  SELECT MAX( t2.datetime ) FROM appointment t2
+  WHERE t1.participant_id = t2.participant_id )
+GROUP BY participant.id;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

@@ -3,7 +3,6 @@
  * interview_rescore.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package sabretooth\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, sabretooth\util;
 
 /**
  * widget operator assignment
- * 
- * @package sabretooth\ui
  */
 class interview_rescore extends \cenozo\ui\widget\base_record
 {
@@ -43,7 +40,7 @@ class interview_rescore extends \cenozo\ui\widget\base_record
 
     $this->set_heading( 'Rescore Interview for '.$this->get_record()->get_participant()->uid );
 
-    // create the recording sub-list widget      
+    // create the recording sub-list widget
     $this->recording_list = lib::create( 'ui\widget\recording_list', $this->arguments );
     $this->recording_list->set_parent( $this );
   }

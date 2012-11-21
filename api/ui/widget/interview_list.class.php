@@ -3,7 +3,6 @@
  * interview_list.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package sabretooth\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, sabretooth\util;
 
 /**
  * widget interview list
- * 
- * @package sabretooth\ui
  */
 class interview_list extends site_restricted_list
 {
@@ -44,7 +41,7 @@ class interview_list extends site_restricted_list
     $this->add_column( 'participant.uid', 'string', 'UID', true );
     $this->add_column( 'qnaire.name', 'string', 'Questionnaire', true );
     $this->add_column( 'completed', 'boolean', 'Completed', true );
-    $this->add_column( 'rescored', 'enum', 'Rescored', true );
+    $this->add_column( 'rescored', 'boolean', 'Rescored', true );
 
     $this->extended_site_selection = true;
   }

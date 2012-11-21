@@ -3,7 +3,6 @@
  * voip_dtmf.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package sabretooth\ui
  * @filesource
  */
 
@@ -15,7 +14,6 @@ use cenozo\lib, cenozo\log, sabretooth\util;
  *
  * Changes the current user's theme.
  * Arguments must include 'theme'.
- * @package sabretooth\ui
  */
 class voip_dtmf extends \cenozo\ui\push
 {
@@ -57,6 +55,7 @@ class voip_dtmf extends \cenozo\ui\push
   {
     parent::execute();
 
+    $voip_call = lib::create( 'business\voip_manager' )->get_call();
     $voip_call->dtmf( $this->get_argument( 'tone' ) );
   }
 }

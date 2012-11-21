@@ -19,10 +19,6 @@ VALUES( "widget", "address", "list", true, "Lists a participant's address entrie
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "address", "primary", true, "Retrieves base address information." );
 
--- alternate
-INSERT INTO operation( type, subject, name, restricted, description )
-VALUES( "widget", "participant", "list_alternate", true, "Lists a participant's alternate for sourcing purposes." );
-
 -- appointment
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "appointment", "delete", true, "Removes a participant's appointment from the system." );
@@ -67,11 +63,47 @@ VALUES( "widget", "availability", "list", true, "Lists a participant's availabil
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "availability", "primary", true, "Retrieves base availability information." );
 
+-- away_time
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "away_time", "delete", true, "Removes an away time from the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "away_time", "edit", true, "Edits a away time's details." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "away_time", "new", true, "Add a new away time to the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "away_time", "add", true, "View a form for creating a new away time." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "away_time", "view", true, "View a away time's details." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "away_time", "list", true, "List away times in the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "away_time", "primary", true, "Retrieves base away time information." );
+
+-- callback
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "callback", "delete", true, "Removes a participant's callback from the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "callback", "edit", true, "Edits the details of a participant's callback." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "callback", "new", true, "Creates new callback entry for a participant." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "callback", "add", true, "View a form for creating new callbacks for a participant." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "callback", "view", true, "View the details of a participant's particular callback." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "callback", "list", true, "Lists a participant's callbacks." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "callback", "primary", true, "Retrieves base callback information." );
+
 -- calendar
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "appointment", "calendar", true, "Shows appointments in a calendar format." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "appointment", "feed", true, "Retrieves a list of appointments for a given time-span." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "callback", "calendar", true, "Shows callbacks in a calendar format." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "callback", "feed", true, "Retrieves a list of callbacks for a given time-span." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "availability", "calendar", true, "Shows aggregate availabilities in a calendar format." );
 INSERT INTO operation( type, subject, name, restricted, description )
@@ -114,6 +146,24 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "interview", "edit", true, "Edits the details of an interview." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "interview", "rescore", true, "Provides an interface to rescore interview based on recordings." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "interview", "list", true, "Retrieves base information for a list of interviews." );
+
+-- opal_instance
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "opal_instance", "delete", true, "Removes a opal instance from the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "opal_instance", "edit", true, "Edits a opal instance's details." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "opal_instance", "new", true, "Add a new opal instance to the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "opal_instance", "add", true, "View a form for creating a new opal instance." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "opal_instance", "view", true, "View a opal instance's details." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "opal_instance", "list", true, "List opal instances in the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "opal_instance", "primary", true, "Retrieves base opal instance information." );
 
 -- operator
 INSERT INTO operation( type, subject, name, restricted, description )
@@ -140,6 +190,10 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "participant", "add_appointment", true, "A form to create a new appointment to add to a participant." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "participant", "delete_appointment", true, "Remove a participant's appointment." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "participant", "add_callback", true, "A form to create a new callback to add to a participant." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "participant", "delete_callback", true, "Remove a participant's callback." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "participant", "add_availability", true, "A form to create a new availability entry to add to a participant." );
 INSERT INTO operation( type, subject, name, restricted, description )
@@ -172,6 +226,8 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "participant", "sync", true, "Returns a summary of changes to be made given a list of UIDs to sync." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "participant", "sync", true, "Updates participants with their information in Mastodon." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "participant", "secondary", true, "Lists a participant's alternates for sourcing purposes." );
 
 -- phase
 INSERT INTO operation( type, subject, name, restricted, description )
@@ -265,6 +321,22 @@ VALUES( "widget", "queue_restriction", "list", true, "List queue restrictions in
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "queue_restriction", "primary", true, "Retrieves base queue restriction information." );
 
+-- quota
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "quota", "delete", true, "Removes a quota from the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "quota", "edit", true, "Edits a quota's details." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "quota", "new", true, "Add a new quota to the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "quota", "add", true, "View a form for creating a new quota." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "quota", "view", true, "View a quota's details." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "quota", "list", true, "List quotas in the system." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "quota", "primary", true, "Retrieves base quota information." );
+
 -- recording
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "recording", "list", true, "Lists recordings." );
@@ -310,10 +382,10 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "widget", "participant_tree", "report", true, "Set up a participant tree report." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "pull", "participant_tree", "report", true, "Download a participant tree report." );
--- INSERT INTO operation( type, subject, name, restricted, description )
--- VALUES( "widget", "daily_shift", "report", true, "Set up a new daily shift report." );
--- INSERT INTO operation( type, subject, name, restricted, description )
--- VALUES( "pull", "daily_shift", "report", true, "Download a new daily shift report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "widget", "appointment", "report", true, "Set up a appointment report." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "pull", "appointment", "report", true, "Download a appointment report." );
 
 -- self
 INSERT INTO operation( type, subject, name, restricted, description )
@@ -408,5 +480,7 @@ INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "voip", "begin_monitor", true, "Starts monitoring the active call." );
 INSERT INTO operation( type, subject, name, restricted, description )
 VALUES( "push", "voip", "end_monitor", true, "Stops monitoring the active call." );
+INSERT INTO operation( type, subject, name, restricted, description )
+VALUES( "push", "voip", "spy", true, "Opens a listen-only connection to an existing operator's call." );
 
 COMMIT;

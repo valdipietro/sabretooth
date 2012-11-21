@@ -3,7 +3,6 @@
  * appointment_calendar.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package sabretooth\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, sabretooth\util;
 
 /**
  * widget appointment calendar
- * 
- * @package sabretooth\ui
  */
 class appointment_calendar extends \cenozo\ui\widget\base_calendar
 {
@@ -54,6 +51,7 @@ class appointment_calendar extends \cenozo\ui\widget\base_calendar
   {
     parent::setup();
 
+    $this->set_variable( 'default_view', 'basicWeek' );
     $this->set_variable( 'allow_all_day', false );
     $this->set_variable( 'editable', true );
   }

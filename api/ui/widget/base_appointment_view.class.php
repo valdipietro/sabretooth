@@ -3,7 +3,6 @@
  * base_appointment_view.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package sabretooth\ui
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, sabretooth\util;
 
 /**
  * base class for appointment view/add classes
- * 
- * @package sabretooth\ui
  */
 abstract class base_appointment_view extends \cenozo\ui\widget\base_view
 {
@@ -45,6 +42,7 @@ abstract class base_appointment_view extends \cenozo\ui\widget\base_view
     // create the site calendar widget
     $this->site_calendar = lib::create( 'ui\widget\site_calendar', $this->arguments );
     $this->site_calendar->set_parent( $this );
+    $this->site_calendar->set_variable( 'default_view', 'basicWeek' );
   }
 
   /**

@@ -3,7 +3,6 @@
  * tokens.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package sabretooth\database
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, sabretooth\util;
 
 /**
  * Access to limesurvey's tokens_SID tables.
- * 
- * @package sabretooth\database
  */
 class tokens extends sid_record
 {
@@ -218,19 +215,29 @@ class tokens extends sid_record
           $alt_number = intval( $matches[1] );
           $aspect = $matches[2];
 
-          if( 'phone' == $aspect )
+          if( count( $alternate_info->data ) < $alt_number )
           {
-            $phone_list = $alternate_info->data[$alt_number - 1]->phone_list;
-            $this->$key = $alt_number <= count( $alternate_info->data )
-                        ? ( is_array( $phone_list ) ? $phone_list[0]->number : '' )
-                        : '';
+            $this->$key = '';
           }
           else
           {
-            $this->$key = $alt_number <= count( $alternate_info->data )
-                        ? $alternate_info->data[$alt_number - 1]->$aspect
-                        : "";
+            if( 'phone' == $aspect )
+            {
+              $phone_list = $alternate_info->data[$alt_number - 1]->phone_list;
+              $this->$key = $alt_number <= count( $alternate_info->data )
+                          ? ( is_array( $phone_list ) ? $phone_list[0]->number : '' )
+                          : '';
+            }
+            else
+            {
+              $this->$key = $alternate_info->data[$alt_number - 1]->$aspect;
+            }
           }
+        }
+        else if( preg_match( '/secondary (first_name|last_name)/', $value ) )
+        {
+          $aspect = str_replace( ' ', '_', $value );
+          if( array_key_exists( $aspect, $_COOKIE ) ) $this->$key = $_COOKIE[$aspect];
         }
         else if( 'previously completed' == $value )
         {

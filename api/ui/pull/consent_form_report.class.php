@@ -3,7 +3,6 @@
  * consent_form_report.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package sabretooth\ui
  * @filesource
  */
 
@@ -14,7 +13,6 @@ use cenozo\lib, cenozo\log, sabretooth\util;
  * Consent form report data.
  * 
  * @abstract
- * @package sabretooth\ui
  */
 class consent_form_report extends \cenozo\ui\pull\base_report
 {
@@ -32,15 +30,12 @@ class consent_form_report extends \cenozo\ui\pull\base_report
   }
 
   /**
-   * Sets up the operation with any pre-execution instructions that may be necessary.
-   * 
+   * Builds the report.
    * @author Patrick Emond <emondpd@mcmaster.ca>
    * @access protected
    */
-  protected function setup()
+  protected function build()
   {
-    parent::setup();
-
     // get the report args
     $db_qnaire = lib::create( 'database\qnaire', $this->get_argument( 'restrict_qnaire_id' ) );
 

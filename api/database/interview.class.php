@@ -3,7 +3,6 @@
  * interview.class.php
  * 
  * @author Patrick Emond <emondpd@mcmaster.ca>
- * @package sabretooth\database
  * @filesource
  */
 
@@ -12,8 +11,6 @@ use cenozo\lib, cenozo\log, sabretooth\util;
 
 /**
  * interview: record
- *
- * @package sabretooth\database
  */
 class interview extends \cenozo\database\has_note
 {
@@ -174,6 +171,26 @@ class interview extends \cenozo\database\has_note
   }
 
   /**
+   * Returns the participant's response for consenting to the cognitive section of the interview
+   * TODO: this method is qnaire-specific, future development needs to make this more generic
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return string
+   * @access public
+   */
+   public function get_cognitive_consent()
+   {
+     $survey_class_name = lib::get_class_name( 'database\limesurvey\survey' );
+     $tokens_class_name = lib::get_class_name( 'database\limesurvey\tokens' );
+
+     $survey_class_name::set_sid( 27345 ); // TODO: make dynamic
+     $survey_mod = lib::create( 'database\modifier' );
+     $survey_mod->where( 'token', '=', $tokens_class_name::determine_token_string( $this ) );
+     $survey_list = $survey_class_name::select( $survey_mod );
+     $db_survey = current( $survey_list );  
+     return $db_survey ? $db_survey->get_response( 'COG_REC_TRM' ) : 'NULL';
+   }
+
+  /**
    * Builds the recording list based on recording files found in the monitor path (if set)
    * 
    * @author Patrick Emond <emondpd@mcmaster.ca>
@@ -217,9 +234,22 @@ class interview extends \cenozo\database\has_note
     }
   }
 
-  // TODO: document
+  /**
+   * Returns the most recent total number of consecutive failed calls.  A maximum of one
+   * failed call per assignment is counted.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @return int
+   * @access public
+   */
   public function get_failed_call_count()
   {
+    if( is_null( $this->id ) )
+    {
+      log::warning( 'Tried to get failed call count for interview with no id.' );
+      return;
+    }
+    
     $assignment_mod = lib::create( 'database\modifier' );
     $assignment_mod->order_desc( 'start_datetime' );
     $assignment_mod->where( 'end_datetime', '!=', NULL );
@@ -237,6 +267,61 @@ class interview extends \cenozo\database\has_note
 
     return $failed_calls;
   }
+  
+  /**
+   * Creates the interview_failed_call_count temporary table needed by all queues.
+   * 
+   * @author Patrick Emond <emondpd@mcmaster.ca>
+   * @access public
+   * @static
+   */
+  public static function create_interview_failed_call_count()
+  {
+    if( static::$interview_failed_call_count_created ) return;
+    static::db()->execute( 'SET @next := @series := @nc := @interview_id := 0' );
+    $sql = 'CREATE TEMPORARY TABLE IF NOT EXISTS interview_failed_call_count '.
+           static::$interview_failed_call_count_sql;
+    static::db()->execute( $sql );
+    static::$interview_failed_call_count_created = true;
+  }
+  
+  /**
+   * Whether the interview_failed_call_count temporary table has been created.
+   * @var boolean
+   * @static
+   */
+  protected static $interview_failed_call_count_created = false;
+
+  /**
+   * A string containing the SQL used to create the interview_failed_call_count data
+   * @var string
+   * @static
+   */
+  protected static $interview_failed_call_count_sql = <<<'SQL'
+SELECT interview_id, total FROM
+(
+  SELECT interview_id, series, max( nc ) AS total
+  FROM
+  (
+    SELECT
+      @next := IF( interview_id != COALESCE( @interview_id, 0 ) OR status = "contacted", 1, 0 ) AS next,
+      @series := COALESCE( @series, 0 ) + IF( @next, 1, 0 ) AS series,
+      @nc := IF( @next, IF( status = "contacted", 0, 1 ), @nc + 1 ) AS nc,
+      @interview_id := interview_id AS interview_id,
+      status
+    FROM
+    (
+      SELECT interview_id, status
+      FROM assignment
+      JOIN phone_call on assignment.id = phone_call.assignment_id
+      WHERE phone_call.end_datetime is not null
+      ORDER by interview_id, phone_call.end_datetime
+    ) AS t1
+  ) AS t2
+  GROUP BY interview_id, series ORDER BY interview_id, series DESC
+) AS t3
+GROUP BY interview_id
+SQL;
 }
 
 // define the join to the participant_site table
@@ -244,4 +329,10 @@ $participant_site_mod = lib::create( 'database\modifier' );
 $participant_site_mod->where(
   'interview.participant_id', '=', 'participant_site.participant_id', false );
 interview::customize_join( 'participant_site', $participant_site_mod );
+
+// define the join to the last assignment
+$assignment_mod = lib::create( 'database\modifier' );
+$assignment_mod->where( 'interview.id', '=', 'interview_last_assignment.interview_id', false );
+$assignment_mod->where( 'interview_last_assignment.assignment_id', '=', 'assignment.id', false );
+interview::customize_join( 'assignment', $assignment_mod );
 ?>
